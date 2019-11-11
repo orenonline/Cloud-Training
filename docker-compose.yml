@@ -1,0 +1,85 @@
+# set up a network local to the host to which we'll attach
+# the containers. this means that the containers will be
+# on the same network and will be able to communicate and
+# lookup each other in DNS.
+
+version: '2'
+
+services:
+  grafana:
+    image: grafana/grafana:6.2.5
+    # first install  plugin, then run grafana
+    entrypoint: /bin/sh
+    command: 
+      #["-c", "grafana-cli plugins install pierosavi-imageit-panel mxswat-separator-panel natel-discrete-panel  && /run.sh"]
+      ["-c", "grafana-cli plugins install pierosavi-imageit-panel 0.1.1
+ && grafana-cli plugins install mxswat-separator-panel 1.0.0 && grafana-cli plugins install natel-discrete-panel 0.0.9 && /run.sh"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "1"
+    restart: always
+    user: $USER
+    ports:
+      - "3000:3000"
+    volumes:
+      - ~/grafana-storage:/var/lib/grafana
+      - ~/grafana-images:/usr/share/grafana/public/img
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+
+ 
+  nodered:
+    image: nodered/node-red-docker:0.20.8
+    restart: always
+    user: $USER
+    ports:
+       - "1880:1880"
+    volumes:
+       - ~/node-red-data:/data
+       - ~/chkdevice/data/devdb:/var/local/node-red/devdb
+    environment:
+       - MIST_DEVDB=/var/local/node-red/devdb
+  
+  influxdb:
+    image: influxdb:1.7.8
+    restart: always
+    ports:
+      - "8086:8086"
+    volumes:
+      - ~/:/var/lib/influxdb
+
+  redis:
+    image: redis:5.0.6
+    command: redis-server --appendonly yes
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./.env/redis:/data"
+
+
+  mosquitto:
+    image: eclipse-mosquitto:1.6.7
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ~/mqtt/config:/mosquitto/config
+      - ~/mqtt/data:/mosquitto/data
+      - ~/mqtt/log:/mosquitto/log
+      - ~/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  webserver:
+    image: nginx:1.17.4
+    restart: always
+    ports:
+      - "3001:80"
+    volumes:
+      - ~/webserver-config:/etc/nginx
+      - ~/web-resource:/home/web-resource 
+  
+
+ 
