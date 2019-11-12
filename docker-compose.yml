@@ -38,9 +38,6 @@ services:
        - "1880:1880"
     volumes:
        - ~/node-red-data:/data
-       - ~/chkdevice/data/devdb:/var/local/node-red/devdb
-    environment:
-       - MIST_DEVDB=/var/local/node-red/devdb
   
   influxdb:
     image: influxdb:1.7.8
