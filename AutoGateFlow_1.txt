@@ -1,0 +1,300 @@
+[
+    {
+        "id": "f15cee7b.96cf1",
+        "type": "tab",
+        "label": "Flow 4",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4e56fb27.7aa524",
+        "type": "ui_switch",
+        "z": "f15cee7b.96cf1",
+        "name": "AutoGate Status",
+        "label": "AutoGate Status",
+        "group": "cb2ec129.19d63",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "passthru": false,
+        "decouple": "true",
+        "topic": "DataReceive",
+        "style": "",
+        "onvalue": "ON",
+        "onvalueType": "str",
+        "onicon": "fa-toggle-on fa-4x",
+        "oncolor": "#f44242",
+        "offvalue": "OFF",
+        "offvalueType": "str",
+        "officon": "fa-toggle-off fa-4x",
+        "offcolor": "#42f456",
+        "x": 520,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "11288057.6d54",
+        "type": "mqtt out",
+        "z": "f15cee7b.96cf1",
+        "name": "DataReceive",
+        "topic": "DataRx",
+        "qos": "2",
+        "retain": "",
+        "broker": "",
+        "x": 510,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "6c44b667.098098",
+        "type": "ui_button",
+        "z": "f15cee7b.96cf1",
+        "name": "Switch ON",
+        "group": "cb2ec129.19d63",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "passthru": false,
+        "label": "OPEN AUTOGATE",
+        "color": "#f44242",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "ON",
+        "payloadType": "str",
+        "topic": "DataReceive",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "11288057.6d54",
+                "4e56fb27.7aa524"
+            ]
+        ]
+    },
+    {
+        "id": "82ece5ff.7eedd8",
+        "type": "ui_button",
+        "z": "f15cee7b.96cf1",
+        "name": "Switch OFF",
+        "group": "cb2ec129.19d63",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "passthru": false,
+        "label": "CLOSE AUTOGATE",
+        "color": "#42f456",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "ON",
+        "payloadType": "str",
+        "topic": "DataReceive",
+        "x": 110,
+        "y": 260,
+        "wires": [
+            [
+                "11288057.6d54",
+                "9bc28ceb.398d7"
+            ]
+        ]
+    },
+    {
+        "id": "9bc28ceb.398d7",
+        "type": "function",
+        "z": "f15cee7b.96cf1",
+        "name": "Make it OFF",
+        "func": "msg.payload = \"OFF\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "4e56fb27.7aa524"
+            ]
+        ]
+    },
+    {
+        "id": "35dc985a.b01f58",
+        "type": "mqtt in",
+        "z": "f15cee7b.96cf1",
+        "name": "",
+        "topic": "DataTx",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "",
+        "x": 90,
+        "y": 340,
+        "wires": [
+            [
+                "dba7519a.242fa",
+                "ab7469e.f1e1998"
+            ]
+        ]
+    },
+    {
+        "id": "2284291a.125126",
+        "type": "function",
+        "z": "f15cee7b.96cf1",
+        "name": "TimeElapsed",
+        "func": "//var lastUpdated = msg.payload.Time;\n//lastUpdated = new Date(lastUpdated).getTime();\nlastUpdated = new Date().getTime();\ncontext.flow.sonoff900 = lastUpdated;\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 490,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dba7519a.242fa",
+        "type": "json",
+        "z": "f15cee7b.96cf1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 340,
+        "wires": [
+            [
+                "2284291a.125126"
+            ]
+        ]
+    },
+    {
+        "id": "edb42629.408fe8",
+        "type": "inject",
+        "z": "f15cee7b.96cf1",
+        "name": "CheckIfOnline",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "1",
+        "x": 140,
+        "y": 460,
+        "wires": [
+            [
+                "ed7181b6.d868e"
+            ]
+        ]
+    },
+    {
+        "id": "ed7181b6.d868e",
+        "type": "function",
+        "z": "f15cee7b.96cf1",
+        "name": "Check Status",
+        "func": "var readCurrent = new Date().getTime();\n//readCurrent = readCurrent + 28800000; //+8 hours\nvar timeElapsed = (readCurrent - context.flow.sonoff900)/1000;\ntimeElapsed = (timeElapsed/60).toFixed(1); //minute\n\n//check if no update for 2 minutes\nif (timeElapsed > 6){\n    msg.payload = \"OFFLINE\";\n} else {\n    msg.payload = \"ONLINE\";\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 460,
+        "wires": [
+            [
+                "a938a954.50e478",
+                "d0ab56e6.792678"
+            ]
+        ]
+    },
+    {
+        "id": "a938a954.50e478",
+        "type": "ui_text",
+        "z": "f15cee7b.96cf1",
+        "group": "cb2ec129.19d63",
+        "order": 6,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Connection Status:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 690,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "ab7469e.f1e1998",
+        "type": "debug",
+        "z": "f15cee7b.96cf1",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 340,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "d0ab56e6.792678",
+        "type": "debug",
+        "z": "f15cee7b.96cf1",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 660,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "6d15236e.a5a72c",
+        "type": "inject",
+        "z": "f15cee7b.96cf1",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "cd6daae1.d995a8"
+            ]
+        ]
+    },
+    {
+        "id": "cd6daae1.d995a8",
+        "type": "function",
+        "z": "f15cee7b.96cf1",
+        "name": "Init ",
+        "func": "//Init to 2 minutes off from now\ncontext.flow.sonoff900 = new Date().getTime() - 120000;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 330,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cb2ec129.19d63",
+        "type": "ui_group",
+        "z": "",
+        "name": "AutoGate Remote Controller",
+        "tab": "7441582c.c3f5d8",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "7441582c.c3f5d8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Remote Gate Controller",
+        "icon": "dashboard",
+        "order": 1
+    }
+]
