@@ -7,13 +7,11 @@ version: '2'
 
 services:
   grafana:
-    image: grafana/grafana:6.2.5
+    image: grafana/grafana
     # first install  plugin, then run grafana
     entrypoint: /bin/sh
     command: 
-      #["-c", "grafana-cli plugins install pierosavi-imageit-panel mxswat-separator-panel natel-discrete-panel  && /run.sh"]
-      ["-c", "grafana-cli plugins install pierosavi-imageit-panel 0.1.1
- && grafana-cli plugins install mxswat-separator-panel 1.0.0 && grafana-cli plugins install natel-discrete-panel 0.0.9 && /run.sh"]
+      ["-c", "grafana-cli plugins install pierosavi-imageit-panel && /run.sh"]
     logging:
       driver: json-file
       options:
@@ -31,7 +29,7 @@ services:
 
  
   nodered:
-    image: nodered/node-red-docker:0.20.8
+    image: nodered/node-red:latest
     restart: always
     user: $USER
     ports:
@@ -40,22 +38,12 @@ services:
        - ~/node-red-data:/data
   
   influxdb:
-    image: influxdb:1.7.8
+    image: influxdb:1.8.10
     restart: always
     ports:
       - "8086:8086"
     volumes:
       - ~/:/var/lib/influxdb
-
-  redis:
-    image: redis:5.0.6
-    command: redis-server --appendonly yes
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - "./.env/redis:/data"
-
 
   mosquitto:
     image: eclipse-mosquitto:1.6.7
@@ -70,7 +58,7 @@ services:
       - ~/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   webserver:
-    image: nginx:1.17.4
+    image: nginx
     restart: always
     ports:
       - "3001:80"
