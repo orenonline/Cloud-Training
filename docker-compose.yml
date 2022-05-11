@@ -21,9 +21,9 @@ services:
     user: $USER
     ports:
       - "3000:3000"
-    volumes:
-      - ~/grafana-storage:/var/lib/grafana
-      - ~/grafana-images:/usr/share/grafana/public/img
+    #volumes:
+    #  - ~/grafana-storage:/var/lib/grafana
+    #  - ~/grafana-images:/usr/share/grafana/public/img
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=secret
 
@@ -34,16 +34,16 @@ services:
     user: $USER
     ports:
        - "1880:1880"
-    volumes:
-       - ~/node-red-data:/data
+    #volumes:
+    #   - ~/node-red-data:/data
   
   influxdb:
     image: influxdb:1.8.10
     restart: always
     ports:
       - "8086:8086"
-    volumes:
-      - ~/:/var/lib/influxdb
+    #volumes:
+    #  - ~/:/var/lib/influxdb
 
   mosquitto:
     image: eclipse-mosquitto:1.6.7
@@ -51,20 +51,20 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
-    volumes:
-      - ~/mqtt/config:/mosquitto/config
-      - ~/mqtt/data:/mosquitto/data
-      - ~/mqtt/log:/mosquitto/log
-      - ~/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    #volumes:
+    #  - ~/mqtt/config:/mosquitto/config
+    #  - ~/mqtt/data:/mosquitto/data
+    #  - ~/mqtt/log:/mosquitto/log
+    #  - ~/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
-  webserver:
-    image: nginx
-    restart: always
-    ports:
-      - "3001:80"
-    volumes:
-      - ~/webserver-config:/etc/nginx
-      - ~/web-resource:/home/web-resource 
+  #webserver:
+  #  image: nginx
+  #  restart: always
+  #  ports:
+  #    - "3001:80"
+  #  volumes:
+  #    - ~/webserver-config:/etc/nginx
+  #    - ~/web-resource:/home/web-resource 
   
 
  
